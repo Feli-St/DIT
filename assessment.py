@@ -2,6 +2,7 @@ def main():
     """Main function"""
     while True:
         take_order()
+        choose_order_type()
         order_summary()
 
         print("Would you like to make another order? (Y/N)")
@@ -11,7 +12,7 @@ def main():
             print("Thank you for ordering at The Pizza Place!")
             break
         else:
-            order.clear()
+            reset_order()
         
         
 def take_order():
@@ -30,7 +31,7 @@ def take_order():
             if "options" in item:
                 size = choose_size(item["options"])
                 if size:
-                    order.append(
+                    order["items"].append(
                         {
                             "name" : item["name"],
                             "size" : size,
@@ -38,7 +39,7 @@ def take_order():
                         }
                     )
             else:
-                order.append(
+                order["items"].append(
                     {
                         "name" : item["name"],
                         "size" : None,
@@ -54,7 +55,7 @@ def take_order():
 def check_input():
     """Check if input is not empty"""
     while True:
-        choice = input(">")
+        choice = input(">").strip()
         if choice:
             break
         else:
@@ -113,17 +114,63 @@ def format_order(item):
 
 def order_summary():
     """Display final order and total price"""
-    if not order:
+    if not order["items"]:
         print("\nNo items ordered.")
         return
     
-    print("\nYour final order:")
+    print("\n--- ORDER SUMMARY ---")
+    print(f"Order Type: {order['order_type'].capitalize()}")
+
+    if order["order_type"] == "delivery":
+        print("Customer Information:")
+
+        for x, y in order["customer_info"].items():
+            print(f"    {x.capitalize()}: {y}")
+
+    print("\nItems ordered:")
     total_price = 0
-    for item in order:
+    for item in order["items"]:
         print(f"- {format_order(item)}")
         total_price += item["price"]
+    if order["order_type"] == "delivery":
+        print(f"\nDelivery charge: ${DELIVERY_CHARGE:.2f}")
+        total_price += DELIVERY_CHARGE
     print(f"\nTotal price: ${total_price:.2f}")
 
+
+
+def choose_order_type():
+    print("\nWould you like to pick up your delivery of have it delivered? (pickup/delivery)")
+    choice = check_input().lower()
+    if choice in ["pickup", "delivery"]:
+        order["order_type"] = choice
+        if choice == "delivery":
+            get_user_info()
+        return
+    
+
+def get_user_info():
+    print("\nPlease provide your delivery details.")
+    name = input("Name: ").strip()
+    phone = input("Phone number: ").strip()
+    address = input("Delivery address: ").strip()
+
+    order["customer_info"] = {
+        "name" : name,
+        "phone" : phone,
+        "address" : address
+    }
+
+
+def reset_order():
+    order["order_type"] = None
+    order["customer_info"] = {}
+    order["items"] = []
+
+
+    
+    
+DELIVERY_CHARGE = 5
 
 menu = {
     "Pizza": [
@@ -145,7 +192,12 @@ menu = {
 
 
 
-order = []
+order = {
+    "order_type" : None,
+    "customer_info" : {},
+    "items" : []
+}
+
 main()
 
 
