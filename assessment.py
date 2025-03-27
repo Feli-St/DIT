@@ -1,17 +1,57 @@
 def main():
+    """Main function"""
     while True:
-        print("Welcome to The Pizza Place.")
-        display_menu()
-        print("What would you like to order?")
+        while True:
+            print("Welcome to The Pizza Place.")
+            display_menu()
+            print("What would you like to order? (Enter 0 to exit)")
+
+            choice = check_input()
+            if choice == "0":
+                break
+
+            item = find_item(choice)
+            if item:
+                if "options" in item:
+                    size = choose_size(item["options"])
+                    if size:
+                        order.append(
+                            {
+                                "name" : item["name"],
+                                "size" : size,
+                                "price" : item["options"][size]
+                            }
+                        )
+                else:
+                    order.append(
+                        {
+                            "name" : item["name"],
+                            "size" : None,
+                            "price" : item["price"]
+                        }
+                    )
+            else:
+                print("Sorry that item is not on the menu.")
+
+        order_summary()
+
+        print("Would you like to make another order? (Y/N)")
         choice = check_input()
-        if choice == "0":
-            break
         
-        print(order)
-    return
+        
+        if choice.lower() not in ["yes", "y"]:
+            print("Thank you for ordering at The Pizza Place!")
+            break
+        else:
+            order.clear()
+        
+        
+
+
 
 
 def check_input():
+    """Check if input is not empty"""
     while True:
         choice = input(">")
         if choice:
@@ -24,18 +64,62 @@ def check_input():
 
 
 def display_menu():
+    print("\n--- MENU ---")
     for category, items in menu.items():
-        print(category)
-        for x, y in items.items():
-            if type(items[x]) == float:
-                print(f"{x} : {items[x]}")
+        print(f"\n{category}:")
+        for item in items:
+            if "options" in item:
+                print(f"    {item['name']}:")
+                for size, price in item["options"].items():
+                    print(f"        {size} - ${price:.2f}")
             else:
-                print(x)
-                for z in y:
-                    print(f"{z} : {y[z]}")
-
-
+                print(f"    {item['name']} - ${item['price']:.2f}")
     return
+
+
+def choose_size(options):
+    print("Available sizes:")
+    for size in options:
+        print(f"- {size}")
+
+    while True:
+        size_choice = input("Choose a size: ").lower()
+        if size_choice in options:
+            return size_choice
+        else: 
+            print("Invalid size")
+
+
+def find_item(choice):
+    for category, items in menu.items():
+        for item in items:
+            if choice.lower() == item["name"].lower():
+                return item
+    return None
+
+
+def format_order(item):
+    """Format order for display"""
+    if item["size"]:
+        return f"{item['name']} ({item['size']}) - ${item['price']:.2f}"
+    else:
+        return f"{item['name']} - ${item['price']:.2f}"
+    
+
+
+def order_summary():
+    """Display final order and total price"""
+    if not order:
+        print("\nNo items ordered.")
+        return
+    
+    print("\nYour final order:")
+    total_price = 0
+    for item in order:
+        print(f"- {format_order(item)}")
+        total_price += item["price"]
+    print(f"\nTotal price: ${total_price:.2f}")
+
 
 menu = {
     "Pizza": [
