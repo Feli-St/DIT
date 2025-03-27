@@ -1,44 +1,12 @@
 def main():
     """Main function"""
     while True:
-        while True:
-            print("Welcome to The Pizza Place.")
-            display_menu()
-            print("What would you like to order? (Enter 0 to exit)")
-
-            choice = check_input()
-            if choice == "0":
-                break
-
-            item = find_item(choice)
-            if item:
-                if "options" in item:
-                    size = choose_size(item["options"])
-                    if size:
-                        order.append(
-                            {
-                                "name" : item["name"],
-                                "size" : size,
-                                "price" : item["options"][size]
-                            }
-                        )
-                else:
-                    order.append(
-                        {
-                            "name" : item["name"],
-                            "size" : None,
-                            "price" : item["price"]
-                        }
-                    )
-            else:
-                print("Sorry that item is not on the menu.")
-
+        take_order()
         order_summary()
 
         print("Would you like to make another order? (Y/N)")
         choice = check_input()
-        
-        
+            
         if choice.lower() not in ["yes", "y"]:
             print("Thank you for ordering at The Pizza Place!")
             break
@@ -46,6 +14,39 @@ def main():
             order.clear()
         
         
+def take_order():
+    """Takes order from user"""
+    while True:
+        print("Welcome to The Pizza Place.")
+        display_menu()
+        print("What would you like to order? (Enter 0 to exit)")
+
+        choice = check_input()
+        if choice == "0":
+            break
+
+        item = find_item(choice)
+        if item:
+            if "options" in item:
+                size = choose_size(item["options"])
+                if size:
+                    order.append(
+                        {
+                            "name" : item["name"],
+                            "size" : size,
+                            "price" : item["options"][size]
+                        }
+                    )
+            else:
+                order.append(
+                    {
+                        "name" : item["name"],
+                        "size" : None,
+                        "price" : item["price"]
+                    }
+                )
+        else:
+            print("Sorry that item is not on the menu.")
 
 
 
@@ -64,6 +65,7 @@ def check_input():
 
 
 def display_menu():
+    """Formats and displays menu to the user"""
     print("\n--- MENU ---")
     for category, items in menu.items():
         print(f"\n{category}:")
@@ -78,6 +80,7 @@ def display_menu():
 
 
 def choose_size(options):
+    """Lets the user choose the size they want"""
     print("Available sizes:")
     for size in options:
         print(f"- {size}")
@@ -91,6 +94,7 @@ def choose_size(options):
 
 
 def find_item(choice):
+    """Finds an item in the menu and returns it"""
     for category, items in menu.items():
         for item in items:
             if choice.lower() == item["name"].lower():
