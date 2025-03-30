@@ -7,6 +7,7 @@ def main():
         take_order()
         choose_order_type()
         order_summary()
+        export_order(order)
 
         print("Would you like to make another order? (Y/N)")
         choice = check_input()
@@ -139,6 +140,9 @@ def order_summary():
     if order["order_type"] == "delivery":
         print(f"\nDelivery charge: ${DELIVERY_CHARGE:.2f}")
         total_price += DELIVERY_CHARGE
+    
+    order['total'] = total_price
+
     print(f"\nTotal price: ${total_price:.2f}")
 
 
@@ -194,6 +198,23 @@ def reset_order():
     order["items"] = []
 
 
+def export_order(order, filename="order.txt"):
+    with open(filename, mode="w", newline="") as file:
+        file.write("Order Summary\n-------------\n")
+        file.write(f"Customer: {order['customer_info']['name']}\n")
+        file.write(f"Pickup or Delivery: {order['order_type']}\n")
+
+        if order["order_type"] == "delivery":
+            file.write(f"Phone: {order['customer_info']['phone']}\n")
+            file.write(f"Address: {order['customer_info']['address']}\n")
+        
+        file.write("\nItems Ordered")
+        
+        for item in order["items"]:
+            file.write(f"- {format_order(item)}")
+
+        file.write(f"\nTotal: ${order['total']:.2f}\n")
+
     
     
 DELIVERY_CHARGE = 5
@@ -221,7 +242,8 @@ menu = {
 order = {
     "order_type" : None,
     "customer_info" : {},
-    "items" : []
+    "items" : [],
+    "total" : 0
 }
 
 main()
