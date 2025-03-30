@@ -1,3 +1,6 @@
+import re
+
+
 def main():
     """Main function"""
     while True:
@@ -18,7 +21,7 @@ def main():
 def take_order():
     """Takes order from user"""
     while True:
-        print("Welcome to The Pizza Place.")
+        print("\nWelcome to The Pizza Place!")
         display_menu()
         print("What would you like to order? (Enter 0 to exit)")
 
@@ -38,6 +41,7 @@ def take_order():
                             "price" : item["options"][size]
                         }
                     )
+                print(f"{item['name']} ({size}) has been added to your order.")
             else:
                 order["items"].append(
                     {
@@ -46,6 +50,7 @@ def take_order():
                         "price" : item["price"]
                     }
                 )
+                print(f"{item['name']} has been added to your order.")
         else:
             print("Sorry that item is not on the menu.")
 
@@ -121,11 +126,10 @@ def order_summary():
     print("\n--- ORDER SUMMARY ---")
     print(f"Order Type: {order['order_type'].capitalize()}")
 
-    if order["order_type"] == "delivery":
-        print("Customer Information:")
+    print("Customer Information:")
 
-        for x, y in order["customer_info"].items():
-            print(f"    {x.capitalize()}: {y}")
+    for x, y in order["customer_info"].items():
+        print(f"    {x.capitalize()}: {y}")
 
     print("\nItems ordered:")
     total_price = 0
@@ -140,20 +144,41 @@ def order_summary():
 
 
 def choose_order_type():
+    """Ask the user to choose between pickup and delivery"""
     print("\nWould you like to pick up your delivery of have it delivered? (pickup/delivery)")
     choice = check_input().lower()
     if choice in ["pickup", "delivery"]:
         order["order_type"] = choice
         if choice == "delivery":
             get_user_info()
+        else: 
+            name = input("Please enter your full name: ")
+            order["customer_info"] = {"name" : name}
         return
     
 
 def get_user_info():
+    """Get customer details for delivery"""
     print("\nPlease provide your delivery details.")
-    name = input("Name: ").strip()
-    phone = input("Phone number: ").strip()
-    address = input("Delivery address: ").strip()
+
+    while True:
+        name = input("Full name: ").strip()
+        if len(name.split()) >= 2:
+            break
+        print("Please enter your full name.")
+
+    while True:
+        phone = input("Phone number: ").strip()
+        if re.fullmatch(r"[\d\s\-+()]+", phone) and len(phone) >= 7:
+            break
+        print("Please enter a valid phone number (7 digits, numbers only)")
+
+    while True:
+        address = input("Delivery address: ").strip()
+        if address:
+            break
+        print("Address cannot be empty")
+
 
     order["customer_info"] = {
         "name" : name,
@@ -163,6 +188,7 @@ def get_user_info():
 
 
 def reset_order():
+    """Resets order for new session"""
     order["order_type"] = None
     order["customer_info"] = {}
     order["items"] = []
