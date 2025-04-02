@@ -1,4 +1,4 @@
-import re
+import re, os
 
 
 def main():
@@ -7,7 +7,8 @@ def main():
         take_order()
         choose_order_type()
         order_summary()
-        export_order(order)
+        print(os.getcwd())
+        export_order(order, r"C:\Users\felis\Documents")
 
         print("Would you like to make another order? (Y/N)")
         choice = check_input()
@@ -199,7 +200,7 @@ def reset_order():
 
 
 def export_order(order, filename="order.txt"):
-    with open(filename, mode="w", newline="") as file:
+    with open(filename, "w") as file:
         file.write("Order Summary\n-------------\n")
         file.write(f"Customer: {order['customer_info']['name']}\n")
         file.write(f"Pickup or Delivery: {order['order_type']}\n")
@@ -208,10 +209,12 @@ def export_order(order, filename="order.txt"):
             file.write(f"Phone: {order['customer_info']['phone']}\n")
             file.write(f"Address: {order['customer_info']['address']}\n")
         
-        file.write("\nItems Ordered")
+        file.write("\nItems Ordered:\n")
         
         for item in order["items"]:
-            file.write(f"- {format_order(item)}")
+            print(repr(format_order(item)))
+            formatted_item = format_order(item)
+            file.write(f"- {formatted_item}\n")
 
         file.write(f"\nTotal: ${order['total']:.2f}\n")
 
