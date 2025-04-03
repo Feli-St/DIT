@@ -7,8 +7,7 @@ def main():
         take_order()
         choose_order_type()
         order_summary()
-        print(os.getcwd())
-        export_order(order, r"C:\Users\felis\Documents")
+        #export_order(order, r"C:\Users\felis\Documents")
 
         print("Would you like to make another order? (Y/N)")
         choice = check_input()
