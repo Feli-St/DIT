@@ -1,11 +1,12 @@
-import re, os
+import re
 
 
 def main():
     """Main function"""
     while True:
         take_order()
-        choose_order_type()
+        if order["items"]:
+            choose_order_type()
         order_summary()
         #export_order(order, r"C:\Users\felis\Documents")
 
@@ -31,6 +32,9 @@ def take_order():
             break
 
         item = find_item(choice)
+        print("How many would you like?")
+        amount = check_int(1)
+
         if item:
             if "options" in item:
                 size = choose_size(item["options"])
@@ -39,19 +43,21 @@ def take_order():
                         {
                             "name" : item["name"],
                             "size" : size,
-                            "price" : item["options"][size]
+                            "price" : item["options"][size],
+                            "amount" : amount
                         }
                     )
-                print(f"{item['name']} ({size}) has been added to your order.")
+                print(f"{amount}x {item['name']} ({size}) has been added to your order.")
             else:
                 order["items"].append(
                     {
                         "name" : item["name"],
                         "size" : None,
-                        "price" : item["price"]
+                        "price" : item["price"],
+                        "amount" : amount
                     }
                 )
-                print(f"{item['name']} has been added to your order.")
+                print(f"{amount}x {item['name']} has been added to your order.")
         else:
             print("Sorry that item is not on the menu.")
 
@@ -68,6 +74,18 @@ def check_input():
             print("Invalid input")
     return choice
 
+
+def check_int(min):
+    """Check if input is an integer and bigger than a minimum"""
+    while True:
+        try:
+            choice = int(input(">"))
+            if choice >= min:
+                return choice
+            else:
+                print(f"Please enter a number bigger than or equal to {min}")
+        except ValueError:
+            print("Please enter an integer")
 
 
 
@@ -112,9 +130,9 @@ def find_item(choice):
 def format_order(item):
     """Format order for display"""
     if item["size"]:
-        return f"{item['name']} ({item['size']}) - ${item['price']:.2f}"
+        return f"{item['amount']}x {item['name']} ({item['size']}) - ${item['price']:.2f}"
     else:
-        return f"{item['name']} - ${item['price']:.2f}"
+        return f"{item['amount']}x {item['name']} - ${item['price']:.2f}"
     
 
 
@@ -136,7 +154,7 @@ def order_summary():
     total_price = 0
     for item in order["items"]:
         print(f"- {format_order(item)}")
-        total_price += item["price"]
+        total_price += item["price"] * item["amount"]
     if order["order_type"] == "delivery":
         print(f"\nDelivery charge: ${DELIVERY_CHARGE:.2f}")
         total_price += DELIVERY_CHARGE
@@ -150,15 +168,25 @@ def order_summary():
 def choose_order_type():
     """Ask the user to choose between pickup and delivery"""
     print("\nWould you like to pick up your delivery of have it delivered? (pickup/delivery)")
-    choice = check_input().lower()
-    if choice in ["pickup", "delivery"]:
-        order["order_type"] = choice
-        if choice == "delivery":
-            get_user_info()
-        else: 
+    while True:
+        choice = check_input().lower()
+        if choice in ["pickup", "delivery"]:
+            order["order_type"] = choice
+            break
+        else:
+            print("Please pick between delivery or pickup.")
+
+    if choice == "delivery":
+        get_user_info()
+    else: 
+        while True:
             name = input("Please enter your full name: ")
-            order["customer_info"] = {"name" : name}
-        return
+            if len(name.split()) >= 2:
+                order["customer_info"] = {"name" : name}
+                break
+            else:
+                print("Please enter both your first and last name.")
+    return
     
 
 def get_user_info():
@@ -175,13 +203,13 @@ def get_user_info():
         phone = input("Phone number: ").strip()
         if re.fullmatch(r"[\d\s\-+()]+", phone) and len(phone) >= 7:
             break
-        print("Please enter a valid phone number (7 digits, numbers only)")
+        print("Please enter a valid phone number (7 digits, numbers only).")
 
     while True:
         address = input("Delivery address: ").strip()
         if address:
             break
-        print("Address cannot be empty")
+        print("Address cannot be empty.")
 
 
     order["customer_info"] = {
@@ -211,7 +239,6 @@ def export_order(order, filename="order.txt"):
         file.write("\nItems Ordered:\n")
         
         for item in order["items"]:
-            print(repr(format_order(item)))
             formatted_item = format_order(item)
             file.write(f"- {formatted_item}\n")
 
