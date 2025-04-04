@@ -38,25 +38,36 @@ def take_order():
         if item:
             if "options" in item:
                 size = choose_size(item["options"])
-                if size:
+                
+                order_item = is_in_order(item["name"], size)
+                if order_item:
+                    order_item["amount"] += amount
+                
+                else:
+                    if size:
+                        order["items"].append(
+                            {
+                                "name" : item["name"],
+                                "size" : size,
+                                "price" : item["options"][size],
+                                "amount" : amount
+                            }
+                        )
+                print(f"{amount}x {item['name']} ({size}) has been added to your order.")
+            else:
+
+                order_item = is_in_order(item["name"])
+                if order_item:
+                    order_item["amount"] += amount
+                else:
                     order["items"].append(
                         {
                             "name" : item["name"],
-                            "size" : size,
-                            "price" : item["options"][size],
+                            "size" : None,
+                            "price" : item["price"],
                             "amount" : amount
                         }
                     )
-                print(f"{amount}x {item['name']} ({size}) has been added to your order.")
-            else:
-                order["items"].append(
-                    {
-                        "name" : item["name"],
-                        "size" : None,
-                        "price" : item["price"],
-                        "amount" : amount
-                    }
-                )
                 print(f"{amount}x {item['name']} has been added to your order.")
         else:
             print("Sorry that item is not on the menu.")
@@ -122,6 +133,17 @@ def find_item(choice):
     """Finds an item in the menu and returns it"""
     for category, items in menu.items():
         for item in items:
+            if choice.lower() == item["name"].lower():
+                return item
+    return None
+
+
+def is_in_order(choice, size=None):
+    for item in order["items"]:
+        if item["size"]:
+          if choice.lower() == item["name"].lower() and item["size"].lower() == size.lower():  
+              return item
+        else:
             if choice.lower() == item["name"].lower():
                 return item
     return None
