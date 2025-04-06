@@ -1,18 +1,20 @@
+"""This program lets the user make orders by choosing from things on a menu"""
 import re
 
 
 def main():
-    """Main function"""
+    """Main function."""
     while True:
         take_order()
         if order["items"]:
             choose_order_type()
         order_summary()
-        #export_order(order, r"C:\Users\felis\Documents")
+        # export_order(order)
+        # The code above technically works but not on the github version
 
         print("Would you like to make another order? (Y/N)")
         choice = check_input()
-            
+  
         if choice.lower() not in ["yes", "y"]:
             print("Thank you for ordering at The Pizza Place!")
             break
@@ -21,7 +23,7 @@ def main():
         
         
 def take_order():
-    """Takes order from user"""
+    """Take order from user."""
     while True:
         print("\nWelcome to The Pizza Place!")
         display_menu()
@@ -32,10 +34,11 @@ def take_order():
             break
 
         item = find_item(choice)
-        print("How many would you like?")
-        amount = check_int(1)
 
         if item:
+            print("How many would you like?")
+            amount = check_int(1)
+
             if "options" in item:
                 size = choose_size(item["options"])
                 
@@ -74,9 +77,8 @@ def take_order():
 
 
 
-
 def check_input():
-    """Check if input is not empty"""
+    """Check if input is not empty."""
     while True:
         choice = input(">").strip()
         if choice:
@@ -87,7 +89,7 @@ def check_input():
 
 
 def check_int(min):
-    """Check if input is an integer and bigger than a minimum"""
+    """Check if input is an integer and bigger than a minimum."""
     while True:
         try:
             choice = int(input(">"))
@@ -99,9 +101,8 @@ def check_int(min):
             print("Please enter an integer")
 
 
-
 def display_menu():
-    """Formats and displays menu to the user"""
+    """Format and display menu to the user."""
     print("\n--- MENU ---")
     for category, items in menu.items():
         print(f"\n{category}:")
@@ -116,7 +117,7 @@ def display_menu():
 
 
 def choose_size(options):
-    """Lets the user choose the size they want"""
+    """Let the user choose the size they want."""
     print("Available sizes:")
     for size in options:
         print(f"- {size}")
@@ -125,12 +126,12 @@ def choose_size(options):
         size_choice = input("Choose a size: ").lower()
         if size_choice in options:
             return size_choice
-        else: 
+        else:
             print("Invalid size")
 
 
 def find_item(choice):
-    """Finds an item in the menu and returns it"""
+    """Find an item in the menu and return it."""
     for category, items in menu.items():
         for item in items:
             if choice.lower() == item["name"].lower():
@@ -139,10 +140,11 @@ def find_item(choice):
 
 
 def is_in_order(choice, size=None):
+    """Find an item in order and return it."""
     for item in order["items"]:
         if item["size"]:
-          if choice.lower() == item["name"].lower() and item["size"].lower() == size.lower():  
-              return item
+            if choice.lower() == item["name"].lower() and item["size"].lower() == size.lower():  
+                return item
         else:
             if choice.lower() == item["name"].lower():
                 return item
@@ -150,16 +152,15 @@ def is_in_order(choice, size=None):
 
 
 def format_order(item):
-    """Format order for display"""
+    """Format order for display."""
     if item["size"]:
         return f"{item['amount']}x {item['name']} ({item['size']}) - ${item['price']:.2f}"
     else:
         return f"{item['amount']}x {item['name']} - ${item['price']:.2f}"
     
 
-
 def order_summary():
-    """Display final order and total price"""
+    """Display final order and total price."""
     if not order["items"]:
         print("\nNo items ordered.")
         return
@@ -186,9 +187,8 @@ def order_summary():
     print(f"\nTotal price: ${total_price:.2f}")
 
 
-
 def choose_order_type():
-    """Ask the user to choose between pickup and delivery"""
+    """Ask the user to choose between pickup and delivery."""
     print("\nWould you like to pick up your delivery of have it delivered? (pickup/delivery)")
     while True:
         choice = check_input().lower()
@@ -212,7 +212,7 @@ def choose_order_type():
     
 
 def get_user_info():
-    """Get customer details for delivery"""
+    """Get customer details for delivery."""
     print("\nPlease provide your delivery details.")
 
     while True:
@@ -233,7 +233,6 @@ def get_user_info():
             break
         print("Address cannot be empty.")
 
-
     order["customer_info"] = {
         "name" : name,
         "phone" : phone,
@@ -242,7 +241,7 @@ def get_user_info():
 
 
 def reset_order():
-    """Resets order for new session"""
+    """Reset order for new session."""
     order["order_type"] = None
     order["customer_info"] = {}
     order["items"] = []
@@ -265,8 +264,6 @@ def export_order(order, filename="order.txt"):
             file.write(f"- {formatted_item}\n")
 
         file.write(f"\nTotal: ${order['total']:.2f}\n")
-
-    
     
 DELIVERY_CHARGE = 5
 
@@ -288,8 +285,6 @@ menu = {
     ],
 }
 
-
-
 order = {
     "order_type" : None,
     "customer_info" : {},
@@ -298,6 +293,3 @@ order = {
 }
 
 main()
-
-
-
