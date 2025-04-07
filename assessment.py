@@ -248,6 +248,7 @@ def reset_order():
 
 
 def export_order(order, filename="order.txt"):
+    """Export order as text file"""
     with open(filename, "w") as file:
         file.write("Order Summary\n-------------\n")
         file.write(f"Customer: {order['customer_info']['name']}\n")
